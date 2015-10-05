@@ -9,6 +9,7 @@ import org.json.simple.JSONValue;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -27,7 +28,7 @@ import java.util.Map.Entry;
  * Note that this class implements the {@link org.apache.hadoop.io.WritableComparable} interface,
  * allowing it to be used as a key/value object in MapReduce programs.
  */
-public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
+public class HipiImageHeader implements WritableComparable<HipiImageHeader>, Serializable {
 
   /**
    * Enumeration of the image storage formats supported in HIPI (e.g, JPEG, PNG, etc.).

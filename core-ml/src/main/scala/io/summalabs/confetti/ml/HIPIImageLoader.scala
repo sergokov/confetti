@@ -33,8 +33,6 @@ object HIPIImageLoader {
       classOf[HipiImageHeader],
       classOf[HipiImage])
 
-    print("Image Count: " + images.count() + " elements ")
-
     val imgAvg: RDD[FloatImage] = images.map(imgData => {
       val value = imgData._2.asInstanceOf[FloatImage]
       val w = value.getWidth
@@ -45,8 +43,8 @@ object HIPIImageLoader {
       // Initialize 3 element array to hold RGB pixel average
       val avgData = new Array[Float](3)
 
-      for (j <- 0 to h) {
-        for (i <- 0 to w) {
+      for (j <- 0 until h) {
+        for (i <- 0 until w) {
           avgData(0) += valData((j * w + i) * 3 + 0) // R
           avgData(1) += valData((j * w + i) * 3 + 1); // G
           avgData(2) += valData((j * w + i) * 3 + 2); // B

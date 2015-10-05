@@ -1,12 +1,14 @@
 package org.hipi.image;
 
+import java.io.Serializable;
+
 /**
  * An abstract base class representing a flat array of image pixel values. Concrete base classes
  * enforce a particular scalar value data type (e.g., byte, float, double, int, etc.).
  *
  * Adapted from {@link java.awt.image.DataBuffer}.
  */
-public abstract class PixelArray {
+public abstract class PixelArray implements Serializable {
 
   public static final int TYPE_BYTE  = 0;
   public static final int TYPE_USHORT = 1;

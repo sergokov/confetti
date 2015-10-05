@@ -12,6 +12,7 @@ import org.apache.hadoop.io.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 
 import javax.imageio.metadata.IIOMetadata;
@@ -21,7 +22,7 @@ import javax.imageio.metadata.IIOMetadata;
  * implements the {@link org.apache.hadoop.io.Writable} interface so that it can be used as a value
  * object in a MapReduce program.
  */
-public abstract class HipiImage implements Writable {
+public abstract class HipiImage implements Writable, Serializable {
 
   /**
    * Enumeration of the supported image object types in HIPI (e.g., FloatImage, ByteImage, etc.).
