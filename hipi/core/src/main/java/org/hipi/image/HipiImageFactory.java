@@ -38,15 +38,28 @@ public class HipiImageFactory {
   private Class<?> imageClass = null;
   private HipiImageType imageType = HipiImageType.UNDEFINED;
 
-  public HipiImageFactory(Class<? extends Mapper<?,?,?,?>> mapperClass)
-    throws InstantiationException,
-	   IllegalAccessException,
-	   ExceptionInInitializerError,
-	   SecurityException,
-	   RuntimeException {
+//  public HipiImageFactory(Class<? extends Mapper<?,?,?,?>> mapperClass)
+//    throws InstantiationException,
+//	   IllegalAccessException,
+//	   ExceptionInInitializerError,
+//	   SecurityException,
+//	   RuntimeException {
+//
+//    findImageClass(mapperClass);
+//
+//    HipiImage image = (HipiImage)imageClass.newInstance();
+//    imageType = image.getType();
+//  }
 
-    findImageClass(mapperClass);
-    
+  public HipiImageFactory(Class<? extends HipiImage> imageClass)
+          throws InstantiationException,
+          IllegalAccessException,
+          ExceptionInInitializerError,
+          SecurityException,
+          RuntimeException {
+
+    this.imageClass = imageClass;
+
     HipiImage image = (HipiImage)imageClass.newInstance();
     imageType = image.getType();
   }

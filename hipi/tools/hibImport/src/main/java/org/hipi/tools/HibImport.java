@@ -1,5 +1,7 @@
 package org.hipi.tools;
 
+import org.apache.hadoop.fs.*;
+import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.hipi.imagebundle.HipiImageBundle;
 import org.hipi.image.HipiImageHeader.HipiImageFormat;
 
@@ -12,10 +14,6 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.ParseException;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FSDataInputStream;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -76,8 +74,14 @@ public class HibImport {
     System.out.println("Input FS: " + (hdfsInput ? "HDFS" : "local FS"));
     System.out.println("Output HIB: " + outputHib);
     System.out.println("Overwrite HIB if it exists: " + (overwrite ? "true" : "false"));
+    System.out.println("Use specific config params");
 
     Configuration conf = new Configuration();
+
+    conf.set("fs.hdfs.impl", DistributedFileSystem.class.getName());
+    conf.set("fs.file.impl", LocalFileSystem.class.getName());
+    conf.addResource(new Path("/usr/local/hadoop/etc/hadoop/core-site.xml"));
+
     FileSystem fs = FileSystem.get(conf);
 
     if (hdfsInput) {

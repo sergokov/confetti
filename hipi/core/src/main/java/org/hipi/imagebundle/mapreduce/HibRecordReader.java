@@ -30,13 +30,16 @@ public class HibRecordReader extends RecordReader<HipiImageHeader, HipiImage> {
   private Configuration conf;
   private HipiImageBundle.HibReader reader;
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void initialize(InputSplit split, TaskAttemptContext context) 
+  public void initialize(InputSplit split, TaskAttemptContext context)
   throws IOException, IllegalArgumentException {
 
     HipiImageFactory imageFactory = null;
     try {
-      imageFactory = new HipiImageFactory(context.getMapperClass());
+      Class<? extends HipiImage> imageClass =
+              (Class<? extends HipiImage>) Class.forName(context.getConfiguration().get(HibInputFormat.IMAGE_CLASS));
+      imageFactory = new HipiImageFactory(imageClass);
     } catch (Exception ex) {
       System.err.println(ex.getMessage());
       ex.printStackTrace();
@@ -45,19 +48,19 @@ public class HibRecordReader extends RecordReader<HipiImageHeader, HipiImage> {
 
     FileSplit bundleSplit = (FileSplit)split;
     conf = context.getConfiguration();
-    
+
     Path path = bundleSplit.getPath();
     FileSystem fs = path.getFileSystem(conf);
-    
+
     Class<? extends Culler> cullerClass = (Class<? extends Culler>)conf.getClass(Culler.HIPI_CULLER_CLASS_ATTR, Culler.class);
 
     // Report locations of first and last byte in image segment
     System.out.println("HibRecordReader#initialize: Input split starts at byte offset " + bundleSplit.getStart() +
 		       " and ends at byte offset " + (bundleSplit.getStart() + bundleSplit.getLength() - 1));
-    
+
     reader = new HipiImageBundle.HibReader(imageFactory, cullerClass, fs, path, bundleSplit.getStart(), bundleSplit.getStart() + bundleSplit.getLength() - 1);
   }
-  
+
   @Override
   public void close() throws IOException {
     reader.close();

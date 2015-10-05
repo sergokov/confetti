@@ -33,6 +33,7 @@ import java.util.Set;
  */
 
 public class HibInputFormat extends FileInputFormat<HipiImageHeader, HipiImage> {
+	public static final String IMAGE_CLASS = "imageClass";
 
   /**
    * Creates a {@link HibRecordReader}
