@@ -12,6 +12,7 @@
     <modules>
         <module>core-ml</module>
         <module>hipi</module>
+        <module>opencv</module>
     </modules>
 
 </project>
