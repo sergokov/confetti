@@ -1,3 +1,5 @@
+package io.summalabs.confetti.opencv;
+
 import static org.bytedeco.javacpp.opencv_core.*;
 import static org.bytedeco.javacpp.opencv_objdetect.*;
 import static org.bytedeco.javacpp.opencv_highgui.*;
@@ -8,18 +10,24 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.*;
  * @author Sergey Kovalev.
  */
 public class FaceDetection {
-    public static final String XML_FILE =
-            "resources/haarcascade_frontalface_default.xml";
+    public static final String XML_FILE = "haarcascade_frontalface_default.xml";
+
+    static {
+        System.out.println("Library Path: " + System.getProperty("java.library.path"));
+        System.loadLibrary("opencv_core");
+        System.loadLibrary("jniopencv_core");
+    }
 
     public static void main(String[] args){
 
-        IplImage img = cvLoadImage("resources/lena.jpg");
-        detect(img);
+        IplImage img = cvLoadImage(args[0]);
+
+        detect(img, args[1]);
     }
 
-    public static void detect(IplImage src) {
+    public static void detect(IplImage src, String path) {
 
-        CvHaarClassifierCascade cascade = new CvHaarClassifierCascade(cvLoad(XML_FILE));
+        CvHaarClassifierCascade cascade = new CvHaarClassifierCascade(cvLoad(path));
         CvMemStorage storage = CvMemStorage.create();
         CvSeq sign = cvHaarDetectObjects(
                 src,
@@ -50,5 +58,4 @@ public class FaceDetection {
         cvWaitKey(0);
 
     }
-
 }
