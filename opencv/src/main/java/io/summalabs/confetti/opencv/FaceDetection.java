@@ -12,11 +12,11 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 public class FaceDetection {
     public static final String XML_FILE = "haarcascade_frontalface_default.xml";
 
-//    static {
-//        System.out.println("Library Path: " + System.getProperty("java.library.path"));
+    static {
+        System.out.println("Library Path: " + System.getProperty("java.library.path"));
 //        System.loadLibrary("opencv_core");
 //        System.loadLibrary("jniopencv_core");
-//    }
+    }
 
     public static void main(String[] args){
 
