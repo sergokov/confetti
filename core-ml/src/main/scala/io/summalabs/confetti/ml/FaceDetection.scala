@@ -6,6 +6,7 @@ import org.apache.hadoop.hdfs.DistributedFileSystem
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkContext, SparkConf}
+import org.bytedeco.javacpp.opencv_core
 import org.bytedeco.javacpp.opencv_core._
 
 import org.hipi.image.{HipiImage, HipiImageHeader, FloatImage}
@@ -37,8 +38,22 @@ object FaceDetection {
       classOf[HipiImage])
 
     val faces: RDD[Int] = images.map(imgData => {
-      val value = imgData._2.asInstanceOf[FloatImage]
-      val imageMat: Mat = OpenCVUtils.convertRasterImageToMat(value)
+      val image = imgData._2.asInstanceOf[FloatImage]
+
+
+      // Generate opencv data type based on input pixel array data type / number of bands
+      val pixelArrayDataType: Int = image.getPixelArray.getDataType
+      val numBands: Int = image.getNumBands
+      val openCVType: Int =OpenCVUtils.generateOpenCVType(pixelArrayDataType, numBands)
+      // Create output mat
+      val mat: opencv_core.Mat = new opencv_core.Mat(image.getHeight, image.getWidth, openCVType)
+      val matType: Int = mat.`type`
+      val depth: Int = opencv_core.CV_MAT_DEPTH(matType)
+
+      System.out.print("------------MatType: " + matType)
+      System.out.print("------------Depth: " + depth)
+
+      val imageMat: Mat = OpenCVUtils.convertRasterImageToMat(image)
       val facesCount: Int = FaceDetector.detect(imageMat, args(1))
       facesCount
     })
