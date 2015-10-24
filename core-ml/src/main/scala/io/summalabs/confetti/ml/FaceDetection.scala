@@ -62,6 +62,7 @@ object FaceDetection {
       System.out.println("------------Depth2: " + depth2)
 
       val facesCount: Int = FaceDetector.detect(imageMat, args(1))
+      System.out.println("------------Face count: " + facesCount)
       facesCount
     })
 
