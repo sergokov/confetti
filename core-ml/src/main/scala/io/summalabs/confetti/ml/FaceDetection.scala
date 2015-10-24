@@ -39,7 +39,7 @@ object FaceDetection {
     val faces: RDD[Int] = images.map(imgData => {
       val value = imgData._2.asInstanceOf[FloatImage]
       val imageMat: Mat = OpenCVUtils.convertRasterImageToMat(value)
-      val facesCount: Int = FaceDetector.detect(imageMat)
+      val facesCount: Int = FaceDetector.detect(imageMat, args(1))
       facesCount
     })
 

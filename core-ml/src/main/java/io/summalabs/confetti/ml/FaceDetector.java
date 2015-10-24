@@ -9,11 +9,8 @@ import static org.bytedeco.javacpp.opencv_objdetect.*;
 public class FaceDetector {
     public static final String XML_FILE = "haarcascade_frontalface_default.xml";
 
-    public static int detect(Mat image) {
-        String file = FaceDetector.class.getClassLoader().getResource(XML_FILE).getFile();
-        System.out.print("Settings file" + file);
-        CvHaarClassifierCascade cascade = new CvHaarClassifierCascade(cvLoad(
-                file));
+    public static int detect(Mat image,String path) {
+        CvHaarClassifierCascade cascade = new CvHaarClassifierCascade(cvLoad(path));
         CvMemStorage storage = CvMemStorage.create();
         CvSeq sign = cvHaarDetectObjects(
                 new IplImage(image),
