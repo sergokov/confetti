@@ -50,10 +50,17 @@ object FaceDetection {
       val matType: Int = mat.`type`
       val depth: Int = opencv_core.CV_MAT_DEPTH(matType)
 
-      System.out.print("------------MatType: " + matType)
-      System.out.print("------------Depth: " + depth)
+      System.out.println("------------numBands: " + numBands)
+      System.out.println("------------MatType: " + matType)
+      System.out.println("------------Depth: " + depth)
+
+      mat.convertTo(mat, opencv_core.CV_8U)
 
       val imageMat: Mat = OpenCVUtils.convertRasterImageToMat(image)
+      imageMat.convertTo(imageMat, opencv_core.CV_8U)
+      val depth2: Int = opencv_core.CV_MAT_DEPTH(matType)
+      System.out.println("------------Depth2: " + depth2)
+
       val facesCount: Int = FaceDetector.detect(imageMat, args(1))
       facesCount
     })
