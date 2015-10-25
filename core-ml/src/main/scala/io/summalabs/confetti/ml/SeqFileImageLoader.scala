@@ -15,14 +15,14 @@ object SeqFileImageLoader {
 
     val file = sc.sequenceFile(args(0), classOf[Text], classOf[BytesWritable])
 
-    val images: RDD[(Text)] = file.map{image => {
+    val images: RDD[String] = file.map{image => {
       val text = image._1.asInstanceOf[Text]
       val imageBytes = image._2.asInstanceOf[BytesWritable]
-      text
+      text.toString
     }}
 
-    val text: Array[Text] = images.take(1)
+    val text: Array[String] = images.take(1)
 
-    println("Image text: " + text.toString)
+    println("Image text: " + text)
   }
 }
