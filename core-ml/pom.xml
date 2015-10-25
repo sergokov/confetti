@@ -79,7 +79,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>scala.etl.VideoEtlProcess</mainClass>
+                            <mainClass>io.summalabs.confetti.ml.ImageToSequenceImport</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
