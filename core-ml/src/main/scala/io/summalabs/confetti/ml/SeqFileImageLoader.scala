@@ -23,6 +23,6 @@ object SeqFileImageLoader {
 
     val text: Array[String] = images.take(1)
 
-    println("Image text: " + text)
+    println("Image text: " + text(0))
   }
 }
