@@ -13,6 +13,7 @@
         <module>core-ml</module>
         <module>hipi</module>
         <module>opencv</module>
+        <module>image-importer</module>
     </modules>
 
 </project>

@@ -79,7 +79,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>io.summalabs.confetti.ml.ImageToSequenceImport</mainClass>
+                            <mainClass></mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
