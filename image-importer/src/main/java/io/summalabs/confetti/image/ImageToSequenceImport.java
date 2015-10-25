@@ -13,6 +13,7 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -82,7 +83,7 @@ public class ImageToSequenceImport {
                 SequenceFile.createWriter(fs, conf, new Path(outputFile), Text.class, BytesWritable.class);
         try {
             for (File file : files) {
-                FSDataInputStream in = fs.open(new Path(file.getPath()));
+                FileInputStream in = new FileInputStream(file);
                 byte buffer[] = new byte[in.available()];
                 in.read(buffer);
                 writer.append(new Text(file.getName()), new BytesWritable(buffer));
