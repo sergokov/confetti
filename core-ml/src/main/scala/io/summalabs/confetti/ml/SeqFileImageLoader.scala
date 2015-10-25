@@ -3,7 +3,6 @@ package io.summalabs.confetti.ml
 import org.apache.hadoop.io.{BytesWritable, Text}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkContext, SparkConf}
-import org.hipi.image.{HipiImage, HipiImageHeader}
 
 /**
  * @author Sergey Kovalev.
