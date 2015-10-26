@@ -15,18 +15,19 @@ object ImageDescriptorCounter {
 
     val file = sc.sequenceFile(args(0), classOf[Text], classOf[BytesWritable])
 
-    val imagesDescriptors: RDD[Descriptor] = file.map{image => {
+    val imagesDescriptors: RDD[(String, Descriptor)] = file.map{image => {
       val text = image._1.asInstanceOf[Text]
       val imageBytes = image._2.asInstanceOf[BytesWritable]
-      text.toString
       val descriptor: Descriptor = Descriptor.buildDscFromRawData(imageBytes.getBytes, Descriptor.DEF_BIN_NUMBER, true)
-      descriptor
+      (text.toString, descriptor)
     }}
 
-    val descriptors: Array[Descriptor] = imagesDescriptors.collect()
+    val descriptors: Array[(String, Descriptor)] = imagesDescriptors.collect()
 
-
-
-    println("Image descriptor size: " + descriptors(0).getSize)
+    descriptors.foreach(imageDesc => {
+      println("Image name: " + imageDesc._1)
+      println("Image descriptor size: " + imageDesc._2.getSize)
+    })
   }
+
 }
