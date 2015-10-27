@@ -7,12 +7,13 @@ import org.opencv.core.MatOfInt;
 import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * Created by ar on 13.10.15.
  */
-public class Descriptor {
+public class Descriptor implements Serializable {
     public static int   DEF_BIN_NUMBER      = 16;
     public static float DEF_FLOAT_THRESHOLD = (Float.MIN_VALUE*1000);
     //
