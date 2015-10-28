@@ -1,6 +1,8 @@
 package io.summalabs.confetti.ml
 
 import org.apache.hadoop.io.{BytesWritable, Text}
+import org.apache.spark.mllib.linalg.distributed.RowMatrix
+import org.apache.spark.mllib.linalg.{Matrix, Vector, Vectors}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkContext, SparkConf}
 import org.opencv.core.Core
@@ -25,6 +27,19 @@ object ImageDescriptorCounter {
       val descriptor: Descriptor = Descriptor.buildDscFromRawData(imageBytes.getBytes, Descriptor.DEF_BIN_NUMBER, true)
       (text.toString, descriptor)
     }}
+
+    val desc: RDD[Vector] = imagesDescriptors.map(imagesDescriptor => imagesDescriptor._2.getData)
+      .map(arr => arr.map(el => el.toDouble)).map(arr => Vectors.dense(arr))
+
+    val descMatrix: RowMatrix = new RowMatrix(desc)
+    val pcaMatrix: Matrix = descMatrix.computePrincipalComponents(8)
+    val initFeaturesPcaMatrix: RowMatrix = descMatrix.multiply(pcaMatrix)
+
+    val indexPca: RDD[(Long, Vector)] = initFeaturesPcaMatrix.rows.zipWithIndex().map(kyVector => (kyVector._2, kyVector._1))
+
+    indexPca.saveAsObjectFile(args(1))
+
+    val indexedVector: RDD[(Long, Vector)] = sc.objectFile(args(1))
 
     val descriptors: Array[(String, Descriptor)] = imagesDescriptors.collect()
 
