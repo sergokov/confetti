@@ -35,11 +35,18 @@ object ImageDescriptorCounter {
     val pcaMatrix: Matrix = descMatrix.computePrincipalComponents(8)
     val initFeaturesPcaMatrix: RowMatrix = descMatrix.multiply(pcaMatrix)
 
-    val indexPca: RDD[(Long, Vector)] = initFeaturesPcaMatrix.rows.zipWithIndex().map(kyVector => (kyVector._2, kyVector._1))
+    val imageDescIndexed: RDD[(Long, String)] = imagesDescriptors.zipWithIndex().map(kyVector => (kyVector._2, kyVector._1._1))
 
-    indexPca.saveAsObjectFile(args(1))
+    val indexPca: RDD[(Long, Vector)] =
+      initFeaturesPcaMatrix.rows.zipWithIndex().map(kyVector => (kyVector._2, kyVector._1))
 
-    val indexedVector: RDD[(Long, Vector)] = sc.objectFile(args(1))
+    val join: RDD[(Long, (String, Vector))] = imageDescIndexed.join(indexPca)
+    val imageDscPca: RDD[(String, Vector)] = join.map(j => j._2)
+
+    imageDscPca.saveAsObjectFile(args(1))
+    val imageDscPcaLoad: RDD[(Long, Vector)] = sc.objectFile(args(1))
+
+    imageDscPcaLoad.saveAsSequenceFile()
 
     val descriptors: Array[(String, Descriptor)] = imagesDescriptors.collect()
 
