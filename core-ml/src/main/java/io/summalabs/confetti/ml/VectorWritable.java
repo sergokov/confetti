@@ -17,13 +17,19 @@ public class VectorWritable implements Writable {
         this.vector = vector;
     }
 
-    @Override
     public void write(DataOutput out) throws IOException {
-
+        double[] vector = this.vector.toArray();
+        out.writeInt(vector.length);
+        for(double value : vector) {
+            out.writeDouble(value);
+        }
     }
 
-    @Override
     public void readFields(DataInput in) throws IOException {
+        double[] vector = new double[in.readInt()];
+        for (int i = 0; i < vector.length; i++) {
+            vector[i]  = in.readDouble();
+        }
 
     }
 }
