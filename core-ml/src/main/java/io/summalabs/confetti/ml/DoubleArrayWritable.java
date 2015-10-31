@@ -9,6 +9,10 @@ import org.apache.hadoop.io.Writable;
  */
 public class DoubleArrayWritable extends ArrayWritable {
 
+    public DoubleArrayWritable(){
+        super(DoubleWritable.class);
+    }
+
     public DoubleArrayWritable(double[] values) {
         super(DoubleWritable.class);
         DoubleWritable[] valuesWritable = new DoubleWritable[values.length];

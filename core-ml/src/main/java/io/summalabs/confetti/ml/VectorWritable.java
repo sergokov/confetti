@@ -13,6 +13,9 @@ import java.io.IOException;
 public class VectorWritable implements Writable {
     private Vector vector;
 
+    public VectorWritable() {
+    }
+
     public VectorWritable(Vector vector) {
         this.vector = vector;
     }
