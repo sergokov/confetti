@@ -13,7 +13,8 @@ public class DoubleArrayWritable extends ArrayWritable {
         super(DoubleWritable.class);
         DoubleWritable[] valuesWritable = new DoubleWritable[values.length];
         for (int i = 0; i < values.length; i++) {
-            valuesWritable[i].set(values[0]);
+            DoubleWritable value = new DoubleWritable(values[i]);
+            valuesWritable[i] = value;
         }
         set(valuesWritable);
     }
@@ -21,7 +22,7 @@ public class DoubleArrayWritable extends ArrayWritable {
     public double[] toPrimitiveArray() {
         Writable[] writableValues = get();
         double[] values = new double[writableValues.length];
-        for (int i =0; i < writableValues.length; i++) {
+        for (int i = 0; i < writableValues.length; i++) {
             values[i] = ((DoubleWritable) writableValues[i]).get();
         }
         return values;
