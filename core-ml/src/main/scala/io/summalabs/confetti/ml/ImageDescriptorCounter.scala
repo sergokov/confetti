@@ -48,7 +48,7 @@ object ImageDescriptorCounter {
 
     val imageDscPcaLoadWr: RDD[(String, VectorWritable)] = imageDscPcaLoad.map(v => (v._1, new VectorWritable(v._2)))
     imageDscPcaLoadWr.saveAsSequenceFile(args(2))
-    val imagesDescriptorsLoaded: RDD[(String, VectorWritable)] = sc.sequenceFile(args(2), classOf[String], classOf[VectorWritable])
+    val imagesDescriptorsLoaded: RDD[(Text, VectorWritable)] = sc.sequenceFile(args(2), classOf[Text], classOf[VectorWritable])
 
     imageDscPcaLoad.map(v => (v._1, new DoubleArrayWritable(v._2.toArray))).saveAsSequenceFile(args(3))
     val testOne: RDD[(String, DoubleArrayWritable)] = sc.sequenceFile(args(3), classOf[String], classOf[DoubleArrayWritable])
