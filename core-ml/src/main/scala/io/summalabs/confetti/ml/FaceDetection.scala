@@ -1,79 +1,34 @@
 package io.summalabs.confetti.ml
 
-//import org.apache.hadoop.conf.Configuration
-//import org.apache.hadoop.fs.{Path, LocalFileSystem}
-//import org.apache.hadoop.hdfs.DistributedFileSystem
-//import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
-//import org.apache.spark.rdd.RDD
-//import org.apache.spark.{SparkContext, SparkConf}
-//import org.bytedeco.javacpp.opencv_core
-//import org.bytedeco.javacpp.opencv_core._
-//
-//import org.hipi.image.{HipiImage, HipiImageHeader, FloatImage}
-//import org.hipi.imagebundle.mapreduce.HibInputFormat
-//import org.hipi.opencv.OpenCVUtils
+import org.apache.hadoop.io.{BytesWritable, Text}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.{SparkContext, SparkConf}
+import org.opencv.core.{CvType, Mat}
+import org.opencv.highgui.Highgui
 
 /**
  * @author Sergey Kovalev.
  */
 object FaceDetection {
-//  def main(args: Array[String]): Unit = {
-//    System.out.println("--------Library Path: " + System.getProperty("java.library.path"))
-//
-//    val conf = new SparkConf().setAppName("ImageLoader")
-//    val sc = new SparkContext(conf)
-//
-//    val config = new Configuration()
-//
-//    config.set(HibInputFormat.IMAGE_CLASS, classOf[FloatImage].getName)
-//
-//    config.set("fs.hdfs.impl", classOf[DistributedFileSystem].getName)
-//    config.set("fs.file.impl", classOf[LocalFileSystem].getName)
-//    config.addResource(new Path("/usr/local/hadoop/etc/hadoop/core-site.xml"))
-//    config.set(FileInputFormat.INPUT_DIR, args(0))
-//
-//    val images: RDD[(HipiImageHeader, HipiImage)] = sc.newAPIHadoopRDD(config,
-//      classOf[HibInputFormat],
-//      classOf[HipiImageHeader],
-//      classOf[HipiImage])
-//
-//    val faces: RDD[Int] = images.map(imgData => {
-//      val image = imgData._2.asInstanceOf[FloatImage]
-//
-//
-//      // Generate opencv data type based on input pixel array data type / number of bands
-//      val pixelArrayDataType: Int = image.getPixelArray.getDataType
-//      val numBands: Int = image.getNumBands
-//      val openCVType: Int =OpenCVUtils.generateOpenCVType(pixelArrayDataType, numBands)
-//      // Create output mat
-//      val mat: opencv_core.Mat = new opencv_core.Mat(image.getHeight, image.getWidth, openCVType)
-//      val matType: Int = mat.`type`
-//      val depth: Int = opencv_core.CV_MAT_DEPTH(matType)
-//
-//      System.out.println("------------numBands: " + numBands)
-//      System.out.println("------------MatType: " + matType)
-//      System.out.println("------------Depth: " + depth)
-//
-//      mat.convertTo(mat, opencv_core.CV_8U)
-//
-//      val imageMat: Mat = OpenCVUtils.convertRasterImageToMat(image)
-//      imageMat.convertTo(imageMat, opencv_core.CV_8U)
-//
-//      val matType2: Int = imageMat.`type`
-//      System.out.println("------------MatType2: " + matType2)
-//
-//      val depth2: Int = opencv_core.CV_MAT_DEPTH(matType2)
-//      System.out.println("------------Depth2: " + depth2)
-//
-//      val facesCount: Int = FaceDetector.detect(imageMat, args(1))
-//      System.out.println("------------Face count: " + facesCount)
-//      facesCount
-//    })
-//
-//    val facesNumber: Int = faces.reduce(_ + _)
-//
-//    println(f"Faces number: $facesNumber%d")
-//  }
+  def main(args: Array[String]): Unit = {
+    val conf = new SparkConf().setAppName("Face Detection")
+    val sc = new SparkContext(conf)
+
+    val file = sc.sequenceFile(args(0), classOf[Text], classOf[BytesWritable])
+
+    val faceCount: RDD[(String, Int)] = file.map{image => {
+      val text = image._1.asInstanceOf[Text]
+      val imageBytes = image._2.asInstanceOf[BytesWritable]
+
+
+      val facesNumber: Int = FaceDetector.detect(imageBytes.getBytes, args(1))
+      (text.toString, facesNumber)
+    }}
+
+    val faces: Array[(String, Int)] = faceCount.collect()
+
+    faces.foreach(face => {
+      println("Image name: " + face._1 + ", Face count: " + face._2)
+    })
+  }
 }
-
-

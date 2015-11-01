@@ -1,27 +1,26 @@
 package io.summalabs.confetti.ml;
 
-//import static org.bytedeco.javacpp.opencv_core.*;
-//import static org.bytedeco.javacpp.opencv_objdetect.*;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
+import org.opencv.highgui.Highgui;
+import org.opencv.objdetect.CascadeClassifier;
 
 /**
  * @author Sergey Kovalev.
  */
 public class FaceDetector {
-//    public static final String XML_FILE = "haarcascade_frontalface_default.xml";
-//
-//    public static int detect(Mat image, String path) {
-//        CvHaarClassifierCascade cascade = new CvHaarClassifierCascade(cvLoad(path));
-//        CvMemStorage storage = CvMemStorage.create();
-//        CvSeq sign = cvHaarDetectObjects(
-//                new IplImage(image),
-//                cascade,
-//                storage,
-//                1.5,
-//                3,
-//                CV_HAAR_DO_CANNY_PRUNING);
-//
-//        cvClearMemStorage(storage);
-//
-//        return sign.total();
-//    }
+
+    public static int detect(byte[] imageData, String path) {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        CascadeClassifier faceDetector = new CascadeClassifier(path);
+        Mat buff = new Mat(1, imageData.length, CvType.CV_8UC1);
+        buff.put(0, 0, imageData);
+        Mat img = Highgui.imdecode(buff, Highgui.CV_LOAD_IMAGE_GRAYSCALE);
+        MatOfRect faceDetections = new MatOfRect();
+        faceDetector.detectMultiScale(img, faceDetections);
+
+        return faceDetections.toArray().length;
+    }
 }
