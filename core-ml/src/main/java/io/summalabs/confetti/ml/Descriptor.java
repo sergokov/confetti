@@ -1,154 +1,124 @@
 package io.summalabs.confetti.ml;
 
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
-import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
- * Created by ar on 13.10.15.
+ * @author gakarak.
  */
 public class Descriptor implements Serializable {
-    public static int   DEF_BIN_NUMBER      = 16;
-    public static float DEF_FLOAT_THRESHOLD = (Float.MIN_VALUE*1000);
-    //
+    public static int DEF_BIN_NUMBER = 16;
+    public static float DEF_FLOAT_THRESHOLD = (Float.MIN_VALUE * 1000);
+    private double[] value;
+
     public Descriptor() {
-        dsc = null;
+    }
+
+    public Descriptor(double[] value) {
+        if (value != null) {
+            throw new IllegalArgumentException("value can't be null");
+        }
+        if (value.length > 0) {
+            throw new IllegalArgumentException("value.length must be > 0");
+        }
+        this.value = value;
     }
 
     public Descriptor(Mat img) {
-        if(img!=null) {
-            build(img, Descriptor.DEF_BIN_NUMBER, true);
-        } else {
-            dsc = null;
+        this(img, Descriptor.DEF_BIN_NUMBER, true);
+    }
+
+    public Descriptor (Mat img, int numBin, boolean isNormed) {
+        build(img, numBin, isNormed);
+    }
+
+    public Descriptor(byte[] data, int numBin, boolean isNormed) {
+        build(OpenCVUtils.decodeByteBuff(data), numBin, isNormed);
+    }
+
+    public double distL1(Descriptor other) {
+        if (other.getValue() != null) {
+            throw new IllegalArgumentException("value can't be null");
+        }
+        if (other.getValue().length > 0) {
+            throw new IllegalArgumentException("value.length must be > 0");
+        }
+        double distL1 = 0;
+        double[] otherValue = other.getValue();
+        for (int i = 0; i < value.length; i++) {
+            distL1 += Math.abs(value[i] - otherValue[i]);
+        }
+        return distL1;
+    }
+
+    private void build(Mat img, int numBin, boolean isNormed) {
+        if (img != null) {
+            throw new IllegalArgumentException("img can't be null");
+        }
+        if (numBin > 0) {
+            throw new IllegalArgumentException("numBin must be > 0");
+        }
+        if (img.empty()) {
+            throw new IllegalArgumentException("img can't be empty");
+        }
+        Mat imgHist = new Mat();
+        value = new double[numBin];
+        Imgproc.calcHist(Collections.singletonList(img), new MatOfInt(0), new Mat(), imgHist,
+                new MatOfInt(numBin), new MatOfFloat(0f, 256f));
+        imgHist.get(0, 0, value);
+        if (isNormed) {
+            normalizeDesc();
         }
     }
-    //
-    public float dstL1(Descriptor d) {
-        if(isValid()&&d.isValid() && (dsc.length==d.getSize())) {
-            float ret = 0.f;
-            float[] tmpDsc = d.getData();
-            for(int ii=0; ii<dsc.length; ii++) {
-                ret += Math.abs(dsc[ii]-tmpDsc[ii]);
+
+    private void normalizeDesc() {
+        double sum = calcSum();
+        if (sum > Descriptor.DEF_FLOAT_THRESHOLD) {
+            for (int i = 0; i < value.length; i++) {
+                value[i] /= sum;
             }
-            return ret;
         } else {
-            return -1.f;
+            double constVal = 1.0d / value.length;
+            Arrays.fill(value, constVal);
         }
     }
-    //
-    public static Descriptor buildDsc(Mat img, int numBin, boolean isNormed) {
-        Descriptor ret = new Descriptor();
-        if(ret.build(img, numBin, isNormed)) {
-            return ret;
-        } else {
-            return null;
+
+    private double calcSum() {
+        double sum = 0.d;
+        for (double v : value) {
+            sum += Math.abs(v);
         }
+        return sum;
     }
-    public static Mat decodeByteBuff(byte[] data, int OCV_DECODE_FLAGS) {
-        if( (data!=null) && (data.length>0)) {
-            Mat buff = new Mat(1,data.length, CvType.CV_8UC1);
-            buff.put(0,0,data);
-            return Highgui.imdecode(buff, OCV_DECODE_FLAGS);
-        } else {
-            return null;
-        }
-    }
-    public static Mat decodeByteBuff(byte[] data) {
-        return Descriptor.decodeByteBuff(data, Highgui.CV_LOAD_IMAGE_UNCHANGED);
-    }
-    public static Descriptor buildDscFromRawData(byte[] data, int numBin, boolean isNormed) {
-        if( (data!=null) && (data.length>0)) {
-            Mat buff = new Mat(1,data.length, CvType.CV_8UC1);
-            buff.put(0,0,data);
-            Mat img  = Highgui.imdecode(buff, Highgui.CV_LOAD_IMAGE_GRAYSCALE);
-            if(!img.empty()) {
-                return Descriptor.buildDsc(img, numBin, isNormed);
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-    public boolean build(Mat img, int numBin, boolean isNormed) {
-        boolean isOk = false;
-        dsc = null;
-        if( (img!=null) && (numBin>0) ) {
-            if(img.depth()>1) {
-                Imgproc.cvtColor(img, img, Imgproc.COLOR_BGR2GRAY);
-            }
-            Mat imgHist = new Mat();
-            dsc = new float[numBin];
-            Imgproc.calcHist(Arrays.asList(img), new MatOfInt(0), new Mat(), imgHist, new MatOfInt(numBin), new MatOfFloat(0f, 256f));
-            imgHist.get(0,0,dsc);
-            if(isNormed) {
-                normalizeDsc();
-            }
-            isOk = true;
-        }
-        return isOk;
-    }
-    public void normalizeDsc() {
-        if(isValid()) {
-            float tmpSum = caclSum();
-            if(tmpSum>Descriptor.DEF_FLOAT_THRESHOLD) {
-                for (int ii=0; ii<dsc.length; ii++) {
-                    dsc[ii] /= tmpSum;
-                }
-            } else {
-                float constVal = 1.f/dsc.length;
-                Arrays.fill(dsc, constVal);
-            }
-        }
-    }
-    public float caclSum() {
-        if(isValid()) {
-            float ret = 0.f;
-            for (int ii=0; ii<dsc.length; ii++) {
-                ret += Math.abs(dsc[ii]);
-            }
-            return ret;
-        } else {
-            return -1.0f;
-        }
-    }
+
     public int getSize() {
-        if(isValid()) {
-            return dsc.length;
-        }
-        return -1;
+        return value.length;
     }
+
     public int getSizeInBytes() {
-        if(isValid()) {
-            return (dsc.length*4); //FIXME:
-        } else {
-            return -1;
-        }
+        return (value.length * 8); //FIXME:
     }
+
     public boolean isValid() {
-        return (dsc!=null)&(dsc.length>0);
+        return (value != null) && (value.length > 0);
     }
-    public float[] getData() {
-        return dsc;
+
+    public double[] getValue() {
+        return value;
     }
+
     public String toString() {
-        if(isValid()) {
-            String strData = "arr[" + dsc.length + "] = {";
-            for(int ii=0; ii<dsc.length; ii++) {
-                strData += "" + dsc[ii] + ", ";
-            }
-            strData += "}";
-            return strData;
-        } else {
-            return "dsc-isInvalid";
+        String strData = "arr[" + value.length + "] = {";
+        for (double v : value) {
+            strData += "" + v + ", ";
         }
+        strData += "}";
+        return strData;
     }
-    //
-    private float[] dsc = null;
 }
