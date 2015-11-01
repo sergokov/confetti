@@ -23,7 +23,7 @@ public class DoubleArrayWritable extends ArrayWritable {
         set(valuesWritable);
     }
 
-    public double[] toPrimitiveArray() {
+    public double[] toArray() {
         Writable[] writableValues = get();
         double[] values = new double[writableValues.length];
         for (int i = 0; i < writableValues.length; i++) {
