@@ -1,5 +1,6 @@
 package io.summalabs.confetti.ml;
 
+import org.apache.commons.lang3.Validate;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
@@ -21,12 +22,7 @@ public class Descriptor implements Serializable {
     }
 
     public Descriptor(double[] value) {
-        if (value != null) {
-            throw new IllegalArgumentException("value can't be null");
-        }
-        if (value.length > 0) {
-            throw new IllegalArgumentException("value.length must be > 0");
-        }
+        checkIfEmpty(value);
         this.value = value;
     }
 
@@ -43,12 +39,7 @@ public class Descriptor implements Serializable {
     }
 
     public double distL1(Descriptor other) {
-        if (other.getValue() != null) {
-            throw new IllegalArgumentException("value can't be null");
-        }
-        if (other.getValue().length > 0) {
-            throw new IllegalArgumentException("value.length must be > 0");
-        }
+        checkIfEmpty(other.getValue());
         double distL1 = 0;
         double[] otherValue = other.getValue();
         for (int i = 0; i < value.length; i++) {
@@ -57,16 +48,31 @@ public class Descriptor implements Serializable {
         return distL1;
     }
 
+    public int getSize() {
+        return value.length;
+    }
+
+    public int getSizeInBytes() {
+        return (value.length * 8); //FIXME:
+    }
+
+    public double[] getValue() {
+        return value;
+    }
+
+    public String toString() {
+        String strData = "arr[" + value.length + "] = {";
+        for (double v : value) {
+            strData += "" + v + ", ";
+        }
+        strData += "}";
+        return strData;
+    }
+
     private void build(Mat img, int numBin, boolean isNormed) {
-        if (img != null) {
-            throw new IllegalArgumentException("img can't be null");
-        }
-        if (numBin > 0) {
-            throw new IllegalArgumentException("numBin must be > 0");
-        }
-        if (img.empty()) {
-            throw new IllegalArgumentException("img can't be empty");
-        }
+        Validate.notNull(img);
+        Validate.isTrue(numBin > 0, "numBin must be > 0");
+        Validate.isTrue(!img.empty(), "Mat can't be empty");
         Mat imgHist = new Mat();
         value = new double[numBin];
         Imgproc.calcHist(Collections.singletonList(img), new MatOfInt(0), new Mat(), imgHist,
@@ -97,28 +103,8 @@ public class Descriptor implements Serializable {
         return sum;
     }
 
-    public int getSize() {
-        return value.length;
-    }
-
-    public int getSizeInBytes() {
-        return (value.length * 8); //FIXME:
-    }
-
-    public boolean isValid() {
-        return (value != null) && (value.length > 0);
-    }
-
-    public double[] getValue() {
-        return value;
-    }
-
-    public String toString() {
-        String strData = "arr[" + value.length + "] = {";
-        for (double v : value) {
-            strData += "" + v + ", ";
-        }
-        strData += "}";
-        return strData;
+    private void checkIfEmpty(double[] value) {
+        Validate.notNull(value);
+        Validate.isTrue(value.length > 0, "Value length must be > 0");
     }
 }
