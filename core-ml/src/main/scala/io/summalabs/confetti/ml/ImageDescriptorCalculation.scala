@@ -43,7 +43,9 @@ object ImageDescriptorCalculation {
 
     desc.foreach(imageDesc => {
       println("Image name: " + imageDesc._1)
-      println("Image descriptor size: " + imageDesc._2.toString)
+      print("Image descriptor : ")
+      imageDesc._2.foreach(el => print(el))
+      println()
     })
   }
 
