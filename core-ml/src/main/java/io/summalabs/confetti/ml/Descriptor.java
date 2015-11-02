@@ -4,6 +4,7 @@ import org.apache.commons.lang3.Validate;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
+import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.Serializable;
@@ -35,7 +36,7 @@ public class Descriptor implements Serializable {
     }
 
     public Descriptor(byte[] data, int numBin, boolean isNormed) {
-        build(OpenCVUtils.decodeByteBuff(data), numBin, isNormed);
+        build(OpenCVUtils.decodeByteBuff(data, Highgui.CV_LOAD_IMAGE_GRAYSCALE), numBin, isNormed);
     }
 
     public double distL1(Descriptor other) {
