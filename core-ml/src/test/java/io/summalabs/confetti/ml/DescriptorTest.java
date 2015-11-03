@@ -21,13 +21,14 @@ public class DescriptorTest {
         image = IOUtils.toByteArray(DescriptorTest.class.getResourceAsStream("/T001_01.png"));
     }
 
-//    @Test
+    @Test
     public void testBuildDescriptor() {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         Descriptor descriptor = new Descriptor(image, Descriptor.DEF_BIN_NUMBER, true);
         double[] value = descriptor.getValue();
         Assert.assertArrayEquals(
-                new double[] {0, 0, 0, 1, 2},
+                new double[] {0.06855, 0.05535, 0.0846, 0.053925, 0.142925, 0.145025, 0.061375, 0.048175, 0.038025,
+                        0.05125, 0.018525, 0.035675, 0.039075, 0.071525, 0.057525, 0.028475},
                 value,
                 1);
     }

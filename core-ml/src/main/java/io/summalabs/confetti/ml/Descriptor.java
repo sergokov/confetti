@@ -1,6 +1,7 @@
 package io.summalabs.confetti.ml;
 
 import org.apache.commons.lang3.Validate;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
@@ -79,8 +80,9 @@ public class Descriptor implements Serializable {
         }
         Mat imgHist = new Mat();
         value = new double[numBin];
-        Imgproc.calcHist(Collections.singletonList(img), new MatOfInt(0), new Mat(), imgHist,
+        Imgproc.calcHist(Arrays.asList(img), new MatOfInt(0), new Mat(), imgHist,
                 new MatOfInt(numBin), new MatOfFloat(0f, 256f));
+        imgHist.convertTo(imgHist, CvType.CV_64F);
         imgHist.get(0, 0, value);
         if (isNormed) {
             normalizeDesc();
