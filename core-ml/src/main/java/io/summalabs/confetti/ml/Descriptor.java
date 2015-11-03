@@ -74,6 +74,9 @@ public class Descriptor implements Serializable {
         Validate.notNull(img);
         Validate.isTrue(numBin > 0, "numBin must be > 0");
         Validate.isTrue(!img.empty(), "Mat can't be empty");
+        if(img.depth()>1) {
+            Imgproc.cvtColor(img, img, Imgproc.COLOR_BGR2GRAY);
+        }
         Mat imgHist = new Mat();
         value = new double[numBin];
         Imgproc.calcHist(Collections.singletonList(img), new MatOfInt(0), new Mat(), imgHist,
