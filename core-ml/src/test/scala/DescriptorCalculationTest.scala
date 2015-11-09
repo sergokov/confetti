@@ -38,7 +38,6 @@ class DescriptorCalculationTest extends FunSuite with Matchers with BeforeAndAft
   }
 
   test("find nearest 5 image") {
-    System.out.println(System.getProperty("java.library.path"))
 
     val images:RDD[(String, Array[Byte])] = sparkContext.parallelize[(String, Array[Byte])](imagesList)
 
@@ -54,6 +53,8 @@ class DescriptorCalculationTest extends FunSuite with Matchers with BeforeAndAft
 
     val nearest5Img: Array[(String, Double)] = ImageDescriptor.findNearestNImages(imageSetToSearch, 5)
 
-    nearest5Img should contain ("Line", 4)
+    val sample: Array[(String, Array[Double])] = imageSetToSearch.collect()
+
+    nearest5Img should not contain sample
   }
 }
