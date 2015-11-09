@@ -43,10 +43,9 @@ object ImageDescriptor {
     sc.sequenceFile(path, classOf[Text], classOf[DoubleArrayWritable]).map(d => (d._1.toString, d._2.toArray))
   }
 
-  def findNearestNImages(imgDescs: RDD[(String, Array[Double])], n:Int):Array[(String, Double)] = {
-    val randomImgDesc:(String, Array[Double]) = imgDescs.take(1)(0)
-    val distance: RDD[(String, Double)] = imgDescs.filter(e => !e._1.equals(randomImgDesc._1)).map(d => {
-      val distanceL1: Double = new Descriptor(randomImgDesc._2).distL1(new Descriptor(d._2))
+  def findNearestNImages(imgDescs: RDD[(String, Array[Double])], searchDesc:Array[Double], n:Int):Array[(String, Double)] = {
+    val distance: RDD[(String, Double)] = imgDescs.map(d => {
+      val distanceL1: Double = new Descriptor(searchDesc).distL1(new Descriptor(d._2))
       (d._1, distanceL1)
     })
 

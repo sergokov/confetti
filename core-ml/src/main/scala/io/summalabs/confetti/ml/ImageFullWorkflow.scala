@@ -28,7 +28,8 @@ object ImageFullWorkflow {
     val imageSetToSearch: RDD[(String, Array[Double])] =
       loadedImgDescs.filter(e => !e._1.equals(randomImgToSearch._1))
 
-    val nearest5Img: Array[(String, Double)] = ImageDescriptor.findNearestNImages(imageSetToSearch, 5)
+    val nearest5Img: Array[(String, Double)] =
+      ImageDescriptor.findNearestNImages(imageSetToSearch, randomImgToSearch._2, 5)
 
     nearest5Img.foreach(el => {
       println("Image name: " + el._1)
