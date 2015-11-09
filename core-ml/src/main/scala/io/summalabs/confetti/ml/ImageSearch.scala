@@ -21,6 +21,8 @@ object ImageSearch {
 
     val randomImgToSearch:(String, Array[Double]) = imageDescPca.take(1)(0)
 
+    println("Sample image name: " + randomImgToSearch._1)
+
     val imageSetToSearch: RDD[(String, Array[Double])] =
       imageDescPca.filter(e => !e._1.equals(randomImgToSearch._1))
 
