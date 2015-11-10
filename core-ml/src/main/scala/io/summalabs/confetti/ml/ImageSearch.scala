@@ -16,8 +16,10 @@ object ImageSearch {
 
     val descriptors: RDD[(String, Descriptor)] = ImageDescriptor.calcImageDescriptor(images).cache()
 
-    val imageDescPca: RDD[(String, Array[Double])] =
-      ImageDescriptor.applyPcaToDescriptors(descriptors).map(d => (d._1, d._2.toArray))
+//    val imageDescPca: RDD[(String, Array[Double])] =
+//      ImageDescriptor.applyPcaToDescriptors(descriptors).map(d => (d._1, d._2.toArray))
+
+    val imageDescPca: RDD[(String, Array[Double])] = descriptors.map(d => (d._1, d._2.getValue))
 
     val imgToSearch:(String, Array[Double]) = imageDescPca.take(1)(0)
 
