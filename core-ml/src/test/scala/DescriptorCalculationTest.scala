@@ -46,15 +46,12 @@ class DescriptorCalculationTest extends FunSuite with Matchers with BeforeAndAft
     val imageDescPca: RDD[(String, Array[Double])] =
       ImageDescriptor.applyPcaToDescriptors(descriptors).map(d => (d._1, d._2.toArray))
 
-    val randomImgToSearch:(String, Array[Double]) = imageDescPca.take(1)(0)
+    val imgToSearch:(String, Array[Double]) = imageDescPca.take(1)(0)
 
-    val imageSetToSearch: RDD[(String, Array[Double])] =
-      imageDescPca.filter(e => !e._1.equals(randomImgToSearch._1))
+    val imageSetToSearch: RDD[(String, Array[Double])] = imageDescPca.filter(e => !e._1.equals(imgToSearch._1))
 
-    val nearest5Img: Array[(String, Double)] = ImageDescriptor.findNearestNImages(imageSetToSearch, 5)
+    val nearest5Img: Array[(String, Double)] = ImageDescriptor.findNearestNImages(imageSetToSearch, imgToSearch._2, 5)
 
-    val sample: Array[(String, Array[Double])] = imageSetToSearch.collect()
-
-    nearest5Img should not contain sample
+    nearest5Img should not contain imgToSearch
   }
 }
