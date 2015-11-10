@@ -30,10 +30,10 @@ object ImageSearch {
     val imageSetToSearch: RDD[(String, Array[Double])] =
       imageDescPca.filter(e => !e._1.equals(imgToSearch._1))
 
-    val nearest5Img: Array[(String, Double)] =
-      ImageDescriptor.findNearestNImages(imageSetToSearch, imgToSearch._2, 5)
+    val nearestImg: Array[(String, Double)] =
+      ImageDescriptor.findNearestNImages(imageSetToSearch, imgToSearch._2, 20)
 
-    nearest5Img.foreach(el => {
+    nearestImg.foreach(el => {
       println("Image name: " + el._1)
       println("Image descriptor distance L1: " + el._2)
     })
