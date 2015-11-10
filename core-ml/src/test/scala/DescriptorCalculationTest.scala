@@ -38,7 +38,6 @@ class DescriptorCalculationTest extends FunSuite with Matchers with BeforeAndAft
   }
 
   test("find nearest 5 image") {
-
     val images:RDD[(String, Array[Byte])] = sparkContext.parallelize[(String, Array[Byte])](imagesList)
 
     val descriptors: RDD[(String, Descriptor)] = ImageDescriptor.calcImageDescriptor(images).cache()
@@ -51,6 +50,32 @@ class DescriptorCalculationTest extends FunSuite with Matchers with BeforeAndAft
     val imageSetToSearch: RDD[(String, Array[Double])] = imageDescPca.filter(e => !e._1.equals(imgToSearch._1))
 
     val nearest5Img: Array[(String, Double)] = ImageDescriptor.findNearestNImages(imageSetToSearch, imgToSearch._2, 5)
+
+    nearest5Img.foreach(el => {
+      println("Image name: " + el._1)
+      println("Image descriptor distance L1: " + el._2)
+    })
+
+    nearest5Img should not contain imgToSearch
+  }
+
+  test("find nearest 5 image without PCA") {
+    val images:RDD[(String, Array[Byte])] = sparkContext.parallelize[(String, Array[Byte])](imagesList)
+
+    val descriptors: RDD[(String, Descriptor)] = ImageDescriptor.calcImageDescriptor(images).cache()
+
+    val imageDescPca: RDD[(String, Array[Double])] = descriptors.map(d => (d._1, d._2.getValue.toArray))
+
+    val imgToSearch:(String, Array[Double]) = imageDescPca.take(1)(0)
+
+    val imageSetToSearch: RDD[(String, Array[Double])] = imageDescPca.filter(e => !e._1.equals(imgToSearch._1))
+
+    val nearest5Img: Array[(String, Double)] = ImageDescriptor.findNearestNImages(imageSetToSearch, imgToSearch._2, 5)
+
+    nearest5Img.foreach(el => {
+      println("Image name: " + el._1)
+      println("Image descriptor distance L1: " + el._2)
+    })
 
     nearest5Img should not contain imgToSearch
   }
