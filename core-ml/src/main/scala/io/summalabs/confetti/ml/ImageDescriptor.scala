@@ -49,6 +49,6 @@ object ImageDescriptor {
       (d._1, distanceL1)
     })
 
-    distance.sortBy(_._2, ascending = false).take(n)
+    distance.sortBy(_._2).take(n)
   }
 }
