@@ -1,5 +1,7 @@
 package io.summalabs.confetti.ml
 
+import java.util.Random
+
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkContext, SparkConf}
 
@@ -21,7 +23,7 @@ object ImageSearch {
 
     val imageDescPca: RDD[(String, Array[Double])] = descriptors.map(d => (d._1, d._2.getValue))
 
-    val imgToSearch:(String, Array[Double]) = imageDescPca.take(1)(0)
+    val imgToSearch:(String, Array[Double]) = imageDescPca.take(20)(new Random().nextInt(20))
 
     println("---------Sample image name----------: " + imgToSearch._1)
 
