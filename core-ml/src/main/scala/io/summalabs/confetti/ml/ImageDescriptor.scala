@@ -18,6 +18,7 @@ object ImageDescriptor {
 
   def calcImageDescriptor(images: RDD[(String, Array[Byte])]): RDD[(String, Descriptor)] = {
     images.map { image => {
+      System.out.println(System.getProperty("java.library.path"))
       System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
       val descriptor: Descriptor = new Descriptor(image._2, Descriptor.DEF_BIN_NUMBER, true)
       (image._1, descriptor)
