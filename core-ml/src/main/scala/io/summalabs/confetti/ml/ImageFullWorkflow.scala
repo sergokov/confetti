@@ -1,5 +1,6 @@
 package io.summalabs.confetti.ml
 
+import org.apache.spark.mllib.linalg.distributed.RowMatrix
 import org.apache.spark.mllib.linalg.{Matrix, Vector, Vectors}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkContext, SparkConf}
@@ -15,9 +16,14 @@ object ImageFullWorkflow {
 
     val images:RDD[(String, Array[Byte])] = ImageDescriptor.loadImages(sc, args(0))
 
-    val descriptors: RDD[(String, Descriptor)] = ImageDescriptor.calcImageDescriptor(images).cache()
+    val descs: RDD[(String, Vector)] = ImageDescriptor
+      .calcImageDescriptor(images).map(desc => (desc._1, Vectors.dense(desc._2.getValue)))
 
-    val imageDescPca: RDD[(String, Vector)] = ImageDescriptor.applyPcaToDescriptors(descriptors)
+    val descMatrix: RowMatrix = new RowMatrix(descs.map(des => des._2))
+    val pca: Matrix = descMatrix.computePrincipalComponents(8)
+    val descPcaMatrix: RowMatrix = descMatrix.multiply(pca)
+
+    val imageDescPca: RDD[(String, Vector)] = ImageDescriptor.joinRdds(descs, descMatrix.rows)
 
     ImageDescriptor.saveImageDescriptors(args(1), imageDescPca)
 

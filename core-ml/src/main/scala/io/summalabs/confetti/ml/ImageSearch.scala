@@ -2,6 +2,8 @@ package io.summalabs.confetti.ml
 
 import java.util.Random
 
+import org.apache.spark.mllib.linalg.{Vectors, Vector, Matrix}
+import org.apache.spark.mllib.linalg.distributed.RowMatrix
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkContext, SparkConf}
 
@@ -16,12 +18,15 @@ object ImageSearch {
 
     val images:RDD[(String, Array[Byte])] = ImageDescriptor.loadImages(sc, args(0))
 
-    val descriptors: RDD[(String, Descriptor)] = ImageDescriptor.calcImageDescriptor(images).cache()
+    val descs: RDD[(String, Vector)] = ImageDescriptor
+      .calcImageDescriptor(images).map(desc => (desc._1, Vectors.dense(desc._2.getValue)))
+
+    val descMatrix: RowMatrix = new RowMatrix(descs.map(des => des._2))
+    val pca: Matrix = descMatrix.computePrincipalComponents(8)
+    val descPcaMatrix: RowMatrix = descMatrix.multiply(pca)
 
     val imageDescPca: RDD[(String, Array[Double])] =
-      ImageDescriptor.applyPcaToDescriptors(descriptors).map(d => (d._1, d._2.toArray))
-
-//    val imageDescPca: RDD[(String, Array[Double])] = descriptors.map(d => (d._1, d._2.getValue))
+      ImageDescriptor.joinRdds(descs, descMatrix.rows).map(desc => (desc._1, desc._2.toArray))
 
     val imgToSearch:(String, Array[Double]) = imageDescPca.take(20)(new Random().nextInt(20))
 

@@ -24,6 +24,12 @@ object ImageDescriptor {
       (image._1, descriptor)
     }}
   }
+  
+  def joinRdds(desc: RDD[(String, Vector)], matrixRows:RDD[Vector]):RDD[(String, Vector)] = {
+    val imageIndexed: RDD[(Long, String)] = desc.zipWithIndex().map(zi => (zi._2, zi._1._1))
+    val descPcaIndexed: RDD[(Long, Vector)] = matrixRows.zipWithIndex().map(zi => (zi._2, zi._1))
+    imageIndexed.join(descPcaIndexed).map(j => j._2)    
+  }
 
   def applyPcaToDescriptors(descriptors: RDD[(String, Descriptor)]):RDD[(String, Vector)] = {
     val descVector: RDD[Vector] = descriptors.map(descriptor => Vectors.dense(descriptor._2.getValue))
